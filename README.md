@@ -1,43 +1,34 @@
-# solana-mobile-app
+# 💎 Solana Mobile App
 
-This is an [Expo](https://expo.dev) project pre-configured with [Uniwind](https://uniwind.dev/) for styling and Solana libraries.
+A mobile application for Solana blockchain built with Expo React Native, featuring wallet integration, Devnet faucet, and balance checking capabilities.
 
-## Technologies
+## ✨ Features
 
-- [Expo](https://expo.dev)
-- [Uniwind](https://uniwind.dev/) (Tailwind CSS for React Native)
-- [@solana/kit](https://github.com/solana-labs/solana-web3.js)
-- [@wallet-ui/react-native-kit](https://github.com/wallet-ui/wallet-ui)
+- **Wallet Integration** - Connect with Phantom or Solflare mobile wallets
+- **Devnet Faucet** - Get free SOL for testing (no real money involved)
+- **Balance Checker** - Check SOL balance of any wallet address
+- **Transaction History** - View recent transactions (coming soon)
+- **Beautiful UI** - Styled with Uniwind/Tailwind CSS
 
-## Get started
+## 🛠️ Tech Stack
 
-1. Install dependencies
+- [Expo](https://expo.dev) - React Native framework
+- [Uniwind](https://uniwind.dev/) - Tailwind CSS for React Native
+- [@solana/web3.js](https://solana-labs.github.io/solana-web3.js/) - Solana blockchain interaction
+- [@wallet-ui/react-native-kit](https://github.com/wallet-ui/wallet-ui) - Mobile wallet adapter
+- [TypeScript](https://www.typescriptlang.org/) - Type safety
 
-   ```bash
-   npm install
-   ```
+## 📋 Prerequisites
 
-2. Start the app
+- Node.js (v18 or later)
+- Android Studio (for emulator)
+- Android SDK with API level 33+
+- Java Development Kit (JDK) 17
 
-This steps builds the dependencies for the development client.
+## 🚀 Getting Started
+
+### 1. Clone the repository
 
 ```bash
-npm run android
-```
-
-In the output, you'll find options to open the app in a:
-
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
-
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
-
-## Learn more
-
-To learn more about developing your project with Expo, look at the following resources:
-
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Uniwind documentation](https://uniwind.dev/): Learn how to style your app with Tailwind CSS.
-- [Solana documentation](https://solana.com/docs): Learn how to build on Solana.
+git clone <your-repo-url>
+cd solana-mobile-app
