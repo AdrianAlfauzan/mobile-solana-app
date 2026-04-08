@@ -2,8 +2,8 @@ import { useState } from 'react'
 import { Text, View, Pressable, Alert, TextInput, ScrollView } from 'react-native'
 import { useMobileWallet } from '@wallet-ui/react-native-kit'
 import { Connection, LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js'
-import { router } from 'expo-router'
 
+// Koneksi ke Solana Devnet (gratis untuk testing)
 const connection = new Connection('https://api.devnet.solana.com')
 
 export default function FaucetScreen() {
@@ -13,6 +13,7 @@ export default function FaucetScreen() {
   const [customAddress, setCustomAddress] = useState('')
   const [txSignature, setTxSignature] = useState('')
 
+  // Cek saldo wallet yang terhubung
   const checkBalance = async () => {
     if (!account) {
       Alert.alert('Error', 'Please connect wallet first')
@@ -33,6 +34,7 @@ export default function FaucetScreen() {
     }
   }
 
+  // Request airdrop SOL gratis dari faucet devnet
   const requestAirdrop = async () => {
     if (!account) {
       Alert.alert('Error', 'Please connect wallet first')
@@ -42,10 +44,17 @@ export default function FaucetScreen() {
     setLoading(true)
     try {
       const pubKey = new PublicKey(account.address)
+
+      // Request 1 SOL gratis (bisa request setiap 24 jam)
       const signature = await connection.requestAirdrop(pubKey, 1 * LAMPORTS_PER_SOL)
       setTxSignature(signature)
+
+      // Tunggu konfirmasi
       await connection.confirmTransaction(signature)
+
       Alert.alert('Success!', '1 SOL has been sent to your wallet (Devnet)')
+
+      // Update balance setelah airdrop
       await checkBalance()
     } catch (error: any) {
       if (error.message?.includes('rate limit')) {
@@ -58,6 +67,7 @@ export default function FaucetScreen() {
     }
   }
 
+  // Cek saldo address lain (tanpa connect wallet)
   const checkCustomAddress = async () => {
     if (!customAddress) {
       Alert.alert('Error', 'Please enter an address')
@@ -79,17 +89,11 @@ export default function FaucetScreen() {
 
   return (
     <ScrollView className="flex-1 bg-white dark:bg-black p-6">
-      {/* Back Button */}
-      <Pressable onPress={() => router.back()} className="mb-20">
-        <Text className="text-blue-600 text-lg">← Back to Home</Text>
-      </Pressable>
-      <Pressable onPress={() => router.back()} className="mb-20">
-        <Text className="text-blue-600 text-lg">← Back to Home</Text>
-      </Pressable>
-
+      {/* Header */}
       <Text className="text-3xl font-bold text-gray-800 dark:text-white mb-2">💰 Solana Devnet Tools</Text>
       <Text className="text-gray-600 dark:text-gray-400 mb-8">Get free SOL for testing (no real money!)</Text>
 
+      {/* Wallet Info */}
       {account && (
         <View className="bg-gray-100 dark:bg-gray-800 p-4 rounded-xl mb-6">
           <Text className="text-sm text-gray-500 dark:text-gray-400 mb-1">Connected Wallet</Text>
@@ -100,7 +104,8 @@ export default function FaucetScreen() {
         </View>
       )}
 
-      <View className="gap-4">
+      {/* Action Buttons */}
+      <View className="space-y-4 gap-4">
         <Pressable
           onPress={checkBalance}
           disabled={loading || !account}
@@ -122,8 +127,10 @@ export default function FaucetScreen() {
         </Pressable>
       </View>
 
+      {/* Divider */}
       <View className="h-px bg-gray-300 dark:bg-gray-700 my-8" />
 
+      {/* Check Custom Address */}
       <Text className="text-xl font-bold text-gray-800 dark:text-white mb-4">🔍 Check Any Address</Text>
 
       <TextInput
@@ -142,6 +149,7 @@ export default function FaucetScreen() {
         <Text className="text-white font-bold text-center text-lg">🔎 Check Balance</Text>
       </Pressable>
 
+      {/* Transaction Signature */}
       {txSignature && (
         <View className="mt-8 p-4 bg-gray-100 dark:bg-gray-800 rounded-xl">
           <Text className="text-sm text-gray-500 dark:text-gray-400 mb-1">Transaction ID:</Text>
@@ -149,6 +157,7 @@ export default function FaucetScreen() {
         </View>
       )}
 
+      {/* Info Note */}
       <View className="mt-8 p-4 bg-yellow-100 dark:bg-yellow-900/30 rounded-xl">
         <Text className="text-yellow-800 dark:text-yellow-400 text-sm">
           ⚠️ Note: This is Devnet (test network). SOL here has no real value. You can request once every 24 hours.

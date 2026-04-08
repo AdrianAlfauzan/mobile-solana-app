@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { Text, View, Pressable, Alert, TextInput, ScrollView } from 'react-native'
 import { useMobileWallet } from '@wallet-ui/react-native-kit'
 import { Connection, LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js'
-import { router } from 'expo-router'
 
 const connection = new Connection('https://api.devnet.solana.com')
 
@@ -11,7 +10,6 @@ export default function FaucetScreen() {
   const [balance, setBalance] = useState<number | null>(null)
   const [loading, setLoading] = useState(false)
   const [customAddress, setCustomAddress] = useState('')
-  const [txSignature, setTxSignature] = useState('')
 
   const checkBalance = async () => {
     if (!account) {
@@ -43,7 +41,6 @@ export default function FaucetScreen() {
     try {
       const pubKey = new PublicKey(account.address)
       const signature = await connection.requestAirdrop(pubKey, 1 * LAMPORTS_PER_SOL)
-      setTxSignature(signature)
       await connection.confirmTransaction(signature)
       Alert.alert('Success!', '1 SOL has been sent to your wallet (Devnet)')
       await checkBalance()
@@ -51,27 +48,8 @@ export default function FaucetScreen() {
       if (error.message?.includes('rate limit')) {
         Alert.alert('Rate Limited', 'You can only request once every 24 hours')
       } else {
-        Alert.alert('Error', 'Failed to get airdrop. Try again later.')
+        Alert.alert('Error', 'Failed to get airdrop')
       }
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const checkCustomAddress = async () => {
-    if (!customAddress) {
-      Alert.alert('Error', 'Please enter an address')
-      return
-    }
-
-    setLoading(true)
-    try {
-      const pubKey = new PublicKey(customAddress)
-      const balanceInLamports = await connection.getBalance(pubKey)
-      const balanceInSOL = balanceInLamports / LAMPORTS_PER_SOL
-      Alert.alert('Balance Check', `${balanceInSOL} SOL (Devnet)`)
-    } catch (error) {
-      Alert.alert('Error', 'Invalid Solana address')
     } finally {
       setLoading(false)
     }
@@ -79,14 +57,6 @@ export default function FaucetScreen() {
 
   return (
     <ScrollView className="flex-1 bg-white dark:bg-black p-6">
-      {/* Back Button */}
-      <Pressable onPress={() => router.back()} className="mb-20">
-        <Text className="text-blue-600 text-lg">← Back to Home</Text>
-      </Pressable>
-      <Pressable onPress={() => router.back()} className="mb-20">
-        <Text className="text-blue-600 text-lg">← Back to Home</Text>
-      </Pressable>
-
       <Text className="text-3xl font-bold text-gray-800 dark:text-white mb-2">💰 Solana Devnet Tools</Text>
       <Text className="text-gray-600 dark:text-gray-400 mb-8">Get free SOL for testing (no real money!)</Text>
 
@@ -100,29 +70,23 @@ export default function FaucetScreen() {
         </View>
       )}
 
-      <View className="gap-4">
-        <Pressable
-          onPress={checkBalance}
-          disabled={loading || !account}
-          className={`py-4 rounded-xl ${!account ? 'bg-gray-400' : 'bg-purple-600'} active:bg-purple-700`}
-        >
-          <Text className="text-white font-bold text-center text-lg">
-            {loading ? 'Loading...' : '💰 Check Balance'}
-          </Text>
-        </Pressable>
+      <Pressable
+        onPress={checkBalance}
+        disabled={loading || !account}
+        className={`py-4 rounded-xl mb-4 ${!account ? 'bg-gray-400' : 'bg-purple-600'}`}
+      >
+        <Text className="text-white font-bold text-center text-lg">{loading ? 'Loading...' : '💰 Check Balance'}</Text>
+      </Pressable>
 
-        <Pressable
-          onPress={requestAirdrop}
-          disabled={loading || !account}
-          className={`py-4 rounded-xl ${!account ? 'bg-gray-400' : 'bg-green-600'} active:bg-green-700`}
-        >
-          <Text className="text-white font-bold text-center text-lg">
-            {loading ? 'Processing...' : '🎁 Get Free 1 SOL'}
-          </Text>
-        </Pressable>
-      </View>
-
-      <View className="h-px bg-gray-300 dark:bg-gray-700 my-8" />
+      <Pressable
+        onPress={requestAirdrop}
+        disabled={loading || !account}
+        className={`py-4 rounded-xl mb-8 ${!account ? 'bg-gray-400' : 'bg-green-600'}`}
+      >
+        <Text className="text-white font-bold text-center text-lg">
+          {loading ? 'Processing...' : '🎁 Get Free 1 SOL'}
+        </Text>
+      </Pressable>
 
       <Text className="text-xl font-bold text-gray-800 dark:text-white mb-4">🔍 Check Any Address</Text>
 
@@ -135,23 +99,29 @@ export default function FaucetScreen() {
       />
 
       <Pressable
-        onPress={checkCustomAddress}
+        onPress={async () => {
+          if (!customAddress) return
+          setLoading(true)
+          try {
+            const pubKey = new PublicKey(customAddress)
+            const balanceInLamports = await connection.getBalance(pubKey)
+            const balanceInSOL = balanceInLamports / LAMPORTS_PER_SOL
+            Alert.alert('Balance Check', `${balanceInSOL} SOL (Devnet)`)
+          } catch (error) {
+            Alert.alert('Error', 'Invalid Solana address')
+          } finally {
+            setLoading(false)
+          }
+        }}
         disabled={loading}
-        className="bg-blue-600 py-4 rounded-xl active:bg-blue-700"
+        className="bg-blue-600 py-4 rounded-xl"
       >
         <Text className="text-white font-bold text-center text-lg">🔎 Check Balance</Text>
       </Pressable>
 
-      {txSignature && (
-        <View className="mt-8 p-4 bg-gray-100 dark:bg-gray-800 rounded-xl">
-          <Text className="text-sm text-gray-500 dark:text-gray-400 mb-1">Transaction ID:</Text>
-          <Text className="text-xs text-gray-800 dark:text-white font-mono">{txSignature}</Text>
-        </View>
-      )}
-
       <View className="mt-8 p-4 bg-yellow-100 dark:bg-yellow-900/30 rounded-xl">
         <Text className="text-yellow-800 dark:text-yellow-400 text-sm">
-          ⚠️ Note: This is Devnet (test network). SOL here has no real value. You can request once every 24 hours.
+          ⚠️ Note: This is Devnet (test network). SOL here has no real value.
         </Text>
       </View>
     </ScrollView>
